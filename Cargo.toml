@@ -1,0 +1,18 @@
+[package]
+name = "expr-minimizer"
+version = "0.1.0"
+edition = "2021"
+description = "Generic arena-based expression rewriter with equality saturation and stochastic fallback."
+
+[dependencies]
+egg = "0.9"
+rug = { version = "1.24", features = ["complex"] }
+rustc-hash = "1.1"
+rayon = "1.8"
+xxhash-rust = { version = "0.8", features = ["xxh3"] }
+num-complex = "0.4"
+rand = "0.8"
+
+[profile.release]
+opt-level = 3
+lto = true

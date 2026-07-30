@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="100">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <logicalFolder name="SourceFiles"
+                    displayName="Source Files"
+                    projectFiles="true"
+                    kind="SOURCE_FOLDER_STORAGE">
+      <itemPath>src/arena.rs</itemPath>
+      <itemPath>src/fingerprint.rs</itemPath>
+      <itemPath>src/main.rs</itemPath>
+      <itemPath>src/rules.rs</itemPath>
+      <itemPath>src/saturate.rs</itemPath>
+      <itemPath>src/stochastic.rs</itemPath>
+    </logicalFolder>
+    <itemPath>Cargo.toml</itemPath>
+    <itemPath>Makefile</itemPath>
+    <itemPath>README.md</itemPath>
+  </logicalFolder>
+  <sourceFolderFilter>^(nbproject|target)$</sourceFolderFilter>
+  <sourceRootList>
+    <Elem>.</Elem>
+  </sourceRootList>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Default" type="3">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>false</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <codeAssistance>
+      </codeAssistance>
+      <makefileType>
+        <makeTool>
+          <buildCommandWorkingDir>.</buildCommandWorkingDir>
+          <buildCommand>cargo build</buildCommand>
+          <cleanCommand>cargo clean</cleanCommand>
+          <executablePath>target/debug/expr-minimizer</executablePath>
+        </makeTool>
+      </makefileType>
+      <item path="src/arena.rs" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/fingerprint.rs" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/main.rs" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/rules.rs" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/saturate.rs" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/stochastic.rs" ex="false" tool="3" flavor2="0">
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>
