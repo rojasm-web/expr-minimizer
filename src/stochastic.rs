@@ -48,13 +48,21 @@ impl Default for SearchConfig {
 /// reference to a shared subexpression counts separately). This matches the
 /// `OpCountCost` extraction metric used in `saturate.rs`.
 pub fn op_count(interner: &Interner, node: u32) -> u64 {
-    match interner.node(node).op {
-        ArenaOp::Var | ArenaOp::Const => 1,
-        ArenaOp::Prim => {
-            let n = interner.node(node);
-            1 + op_count(interner, n.a) + op_count(interner, n.b)
-        }
+    let mut memo: rustc_hash::FxHashMap<u32, u64> = rustc_hash::FxHashMap::default();
+    op_count_rec(interner, node, &mut memo)
+}
+
+fn op_count_rec(interner: &Interner, node: u32, memo: &mut rustc_hash::FxHashMap<u32, u64>) -> u64 {
+    if let Some(&cached) = memo.get(&node) {
+        return cached;
     }
+    let n = interner.node(node);
+    let cost = match n.op {
+        ArenaOp::Var | ArenaOp::Const => 1,
+        ArenaOp::Prim => 1 + op_count_rec(interner, n.a, memo) + op_count_rec(interner, n.b, memo),
+    };
+    memo.insert(node, cost);
+    cost
 }
 
 /// Hamming distance between two equal-length byte arrays (the raw,
