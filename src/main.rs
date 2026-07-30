@@ -7,7 +7,9 @@
 //! the single free-variable leaf.
 
 pub mod arena;
+pub mod equiv;
 pub mod fingerprint;
+pub mod parser;
 pub mod rules;
 pub mod saturate;
 pub mod stochastic;
@@ -99,6 +101,16 @@ pub fn minimize_expr(expr: &Arena, root: u32, budget: Duration) -> (Arena, u32, 
         }
     }
 
+    // Final cleanup pass: independently of whatever rules.rs supplied,
+    // scan the winning expression bottom-up and collapse any subtrees that
+    // are numerically equivalent (agree at all sample points) down to
+    // whichever is cheapest, regardless of whether an explicit algebraic
+    // rule justifies the identity. This catches equivalences saturation's
+    // rule set doesn't know about, and handles equivalence classes with
+    // more than two members via `equiv::collapse_equivalent_subtrees`'s
+    // fixed-point iteration.
+    best = equiv::collapse_equivalent_subtrees(&mut interner, best, 8);
+
     // Materialize a fresh, minimal arena containing only the winning
     // expression's reachable nodes, in a stable topological (child-before-
     // parent) order, matching the invariant `rehydrate` relies on.
@@ -143,10 +155,11 @@ fn extract_rec(
 fn main() {
     // This crate is primarily a library (see `minimize_expr`); the binary
     // entry point exists for smoke-testing during development.
+    //
+    // Input can now be written as text instead of chained intern_* calls,
+    // e.g. "f(f(x, 1), 1)" or "eml(x, 1+2i)".
     let mut interner = Interner::new();
-    let x = interner.intern_var();
-    let c = interner.intern_const(num_complex::Complex64::new(1.0, 0.0));
-    let root = interner.intern_prim(x, c);
+    let root = parser::parse(&mut interner, "f(x, 1)").expect("valid expression");
     let (arena, out_root, op_count) =
         minimize_expr(&interner.arena, root, Duration::from_millis(500));
     println!(
@@ -161,6 +174,23 @@ fn main() {
 mod tests {
     use super::*;
     use num_complex::Complex64;
+
+    #[test]
+    fn minimize_expr_accepts_parsed_text_input() {
+        let mut interner = Interner::new();
+        let root = parser::parse(&mut interner, "f(f(x, 1), 1+0i)").expect("valid expression");
+        let before_bytes = sample_bytes(&interner, root);
+
+        let (out_arena, out_root, _op_count) =
+            minimize_expr(&interner.arena, root, Duration::from_millis(300));
+
+        let (out_interner, _) = rehydrate(&out_arena);
+        let after_bytes = sample_bytes(&out_interner, out_root);
+        assert_eq!(
+            before_bytes, after_bytes,
+            "minimization of parsed input must not change the expression's function"
+        );
+    }
 
     #[test]
     fn minimize_expr_preserves_functional_behavior() {
