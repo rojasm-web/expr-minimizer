@@ -1,0 +1,129 @@
+=========================================================
+          SYMBOLIC CONSTANT SUBTREES CATALOG             
+=========================================================
+
+id 0:
+  Symbolic Value  : 1
+  Numerical Value : 1.000000
+  EML Subtree     : 1
+
+id 1:
+  Symbolic Value  : e
+  Numerical Value : 2.718282
+  EML Subtree     : eml(1,1)
+
+id 2:
+  Symbolic Value  : e^e
+  Numerical Value : 15.154262
+  EML Subtree     : eml(eml(1,1),1)
+
+id 3:
+  Symbolic Value  : 0
+  Numerical Value : 0.000000
+  EML Subtree     : eml(1,eml(eml(1,1),1))
+
+id 4:
+  Symbolic Value  : +inf
+  Numerical Value : inf
+  EML Subtree     : eml(1,eml(1,eml(eml(1,1),1)))
+
+id 5:
+  Symbolic Value  : -inf
+  Numerical Value : -inf
+  EML Subtree     : eml(1,eml(1,eml(1,eml(eml(1,1),1))))
+
+id 6:
+  Symbolic Value  : -1
+  Numerical Value : -1.000000
+  EML Subtree     : eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))
+
+id 7:
+  Symbolic Value  : e^-1
+  Numerical Value : 0.367879
+  EML Subtree     : eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)
+
+id 8:
+  Symbolic Value  : 2
+  Numerical Value : 2.000000
+  EML Subtree     : eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1))
+
+id 9:
+  Symbolic Value  : -ln(2)
+  Numerical Value : -0.693147
+  EML Subtree     : eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))
+
+id 10:
+  Symbolic Value  : e - ln(-ln(2))
+  Numerical Value : 3.084795 + -3.141593i
+  EML Subtree     : eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1))))
+
+id 11:
+  Symbolic Value  : e^(e - ln(-ln(2)))
+  Numerical Value : -21.862979
+  EML Subtree     : eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)
+
+id 12:
+  Symbolic Value  : ln(-ln(2))
+  Numerical Value : -0.366513 + 3.141593i
+  EML Subtree     : eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1))
+
+id 13:
+  Symbolic Value  : e - (i * pi)
+  Numerical Value : 2.718282 + -3.141593i
+  EML Subtree     : eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)))
+
+id 14:
+  Symbolic Value  : e^(e - (i * pi))
+  Numerical Value : -15.154262
+  EML Subtree     : eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1)
+
+id 15:
+  Symbolic Value  : i * pi
+  Numerical Value : 3.141593i
+  EML Subtree     : eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))
+
+id 16:
+  Symbolic Value  : e - ln(i * pi)
+  Numerical Value : 1.573552 + -1.570796i
+  EML Subtree     : eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1)))
+
+id 17:
+  Symbolic Value  : e^(e - ln(i * pi))
+  Numerical Value : -4.823751i
+  EML Subtree     : eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)
+
+id 18:
+  Symbolic Value  : ln(i * pi)
+  Numerical Value : 1.144730 + 1.570796i
+  EML Subtree     : eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1))
+
+id 19:
+  Symbolic Value  : i * pi
+  Numerical Value : 3.141593i
+  EML Subtree     : eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)
+
+id 20:
+  Symbolic Value  : -ln(i * pi)
+  Numerical Value : -1.144730 + -1.570796i
+  EML Subtree     : eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1))
+
+id 21:
+  Symbolic Value  : e^-ln(i * pi)
+  Numerical Value : -0.318310i
+  EML Subtree     : eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)
+
+id 22:
+  Symbolic Value  : -ln(2) - -ln(i * pi)
+  Numerical Value : 0.451583 + 1.570796i
+  EML Subtree     : eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1))
+
+id 23:
+  Symbolic Value  : e^(-ln(2) - -ln(i * pi))
+  Numerical Value : 1.570796i
+  EML Subtree     : eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1)
+
+id 24:
+  Symbolic Value  : e^e^(-ln(2) - -ln(i * pi))
+  Numerical Value : 1.000000i
+  EML Subtree     : eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1)
+

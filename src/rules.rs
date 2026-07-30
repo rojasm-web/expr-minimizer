@@ -16,11 +16,17 @@ use crate::saturate::L;
 /// `Vec<Rewrite<L, ()>>`. Replace/extend this with the real rule list.
 pub fn placeholder_rules() -> Vec<Rewrite<L, ()>> {
     vec![
-        // Placeholder: commute the two children of the primitive. This is
-        // almost certainly NOT a valid identity for f(a,b) = exp(a)-log(b)
-        // in general -- it's here purely to demonstrate that a two-sided
-        // (bidirectional) rule round-trips through the harness.
-        rewrite!("placeholder-commute"; "(f ?a ?b)" => "(f ?b ?a)"),
+        // NOTE: a "placeholder-commute" rule (f a b => f b a) used to live
+        // here. It was explicitly documented as almost certainly invalid
+        // for the non-commutative f(a,b) = exp(a)-log(b), and it turned out
+        // to actually bite: with OpCountCost giving both orderings equal
+        // cost, the extractor's tie-break could return the commuted
+        // (wrong) expression. Removed until a real, validated rule
+        // justifies merging those e-classes. `main.rs::minimize_expr` also
+        // now double-checks the extractor's pick against the original's
+        // fingerprint as defense in depth, in case a future rule is
+        // similarly unsound.
+        //
         // Placeholder: a trivial reflexive/no-op rule, useful as a sanity
         // check that the runner terminates cleanly even with a rule that
         // can't reduce cost.
