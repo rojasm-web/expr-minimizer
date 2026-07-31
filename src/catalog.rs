@@ -11,7 +11,7 @@ use crate::arena::{Interner, Op};
 
 /// Helper to format variable names when node metadata is absent
 fn get_var_name(_interner: &Interner, node_id: u32) -> String {
-    format!("x{}", node_id)
+    format!("x")
 }
 
 /// Symbolic AST representation used for exact algebraic evaluation, simplification, and formatting.
