@@ -70,7 +70,12 @@ impl SymbolicExpr {
             SymbolicExpr::Mul(a, b) => match (a.as_ref(), b.as_ref()) {
                 (SymbolicExpr::Num(1), SymbolicExpr::I) | (SymbolicExpr::I, SymbolicExpr::Num(1)) => "i".to_string(),
                 (SymbolicExpr::Num(-1), SymbolicExpr::I) | (SymbolicExpr::I, SymbolicExpr::Num(-1)) => "-i".to_string(),
+                (SymbolicExpr::Neg(inner), SymbolicExpr::Num(n)) | (SymbolicExpr::Num(n), SymbolicExpr::Neg(inner)) if **inner == SymbolicExpr::I => format!("-{}i", n),
+                (SymbolicExpr::I, SymbolicExpr::Neg(inner)) | (SymbolicExpr::Neg(inner), SymbolicExpr::I) if matches!(inner.as_ref(), SymbolicExpr::Num(_)) => if let SymbolicExpr::Num(n) = inner.as_ref() { format!("-{}i", n) } else { format!("-{} * i", inner.format_clean()) },
                 (SymbolicExpr::Num(n), SymbolicExpr::I) | (SymbolicExpr::I, SymbolicExpr::Num(n)) => format!("{}i", n),
+                (SymbolicExpr::Neg(inner), SymbolicExpr::Var(n)) | (SymbolicExpr::Var(n), SymbolicExpr::Neg(inner)) if **inner == SymbolicExpr::I => format!("-{}i", n),
+                (SymbolicExpr::I, SymbolicExpr::Neg(inner)) | (SymbolicExpr::Neg(inner), SymbolicExpr::I) if matches!(inner.as_ref(), SymbolicExpr::Var(_)) => if let SymbolicExpr::Var(n) = inner.as_ref() { format!("-{}i", n) } else { format!("-{} * i", inner.format_clean()) },
+                (SymbolicExpr::Var(n), SymbolicExpr::I) | (SymbolicExpr::I, SymbolicExpr::Var(n)) => format!("{}i", n),
                 (SymbolicExpr::Num(1), x) | (x, SymbolicExpr::Num(1)) => x.format_clean(),
                 _ => format!("{} * {}", a.format_parenthesized(), b.format_parenthesized()),
             },
@@ -300,9 +305,8 @@ fn simplify_pass(expr: SymbolicExpr) -> SymbolicExpr {
             match (a_red, b_red) {
                 (x, SymbolicExpr::Num(1)) => x,
                 (SymbolicExpr::Num(0), _) => SymbolicExpr::Num(0),
-                (SymbolicExpr::Num(na), SymbolicExpr::Num(nb)) if nb != 0 && na % nb == 0 => {
-                    SymbolicExpr::Num(na / nb)
-                }
+                (SymbolicExpr::Num(na), SymbolicExpr::Num(nb)) if nb != 0 && na % nb == 0 => SymbolicExpr::Num(na / nb),
+                (x, SymbolicExpr::I) => SymbolicExpr::Mul(Box::new(SymbolicExpr::Neg(Box::new(SymbolicExpr::I))), Box::new(x)),
                 (l, r) => SymbolicExpr::Div(Box::new(l), Box::new(r)),
             }
         }
