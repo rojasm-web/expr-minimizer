@@ -259,6 +259,7 @@ fn main() {
     let og_single_line = to_expr_string(&interner, root);
     let min_single_line = to_expr_string(&min_interner, min_root);
     catalog::export_constant_catalog(&min_interner, min_root, "constants_catalog.txt");
+    catalog::export_symbolic_catalog(&min_interner, min_root, &rustc_hash::FxHashMap::default(), "symbolic_catalog.txt");
 
     let mut file = File::create("expressions.txt").expect("failed to create expressions.txt");
     writeln!(file, "ORIGINAL:\n{}", og_single_line).unwrap();

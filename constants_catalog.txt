@@ -58,7 +58,7 @@ id 10:
   EML Subtree     : eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1))))
 
 id 11:
-  Symbolic Value  : e^(e - ln(-ln(2)))
+  Symbolic Value  : e^e/-ln(2)
   Numerical Value : -21.862979
   EML Subtree     : eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)
 
@@ -88,7 +88,7 @@ id 16:
   EML Subtree     : eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1)))
 
 id 17:
-  Symbolic Value  : e^(e - ln(i * pi))
+  Symbolic Value  : e^e/(i * pi)
   Numerical Value : -4.823751i
   EML Subtree     : eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)
 
@@ -158,7 +158,7 @@ id 35:
   EML Subtree     : eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1),1))),1)))
 
 id 36:
-  Symbolic Value  : e^(e - ln(-(i * pi)/2))
+  Symbolic Value  : e^e/-(i * pi)/2
   Numerical Value : 9.647503i
   EML Subtree     : eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1),1))),1))),1)
 
@@ -173,7 +173,7 @@ id 49:
   EML Subtree     : eml(1,eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))
 
 id 50:
-  Symbolic Value  : e^(e - ln(2))
+  Symbolic Value  : e^e/2
   Numerical Value : 7.577131
   EML Subtree     : eml(eml(1,eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1))),1)
 
@@ -188,7 +188,7 @@ id 52:
   EML Subtree     : eml(1,eml(1,eml(eml(1,eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1))),1)))
 
 id 53:
-  Symbolic Value  : e^(e - ln(ln(2)))
+  Symbolic Value  : e^e/ln(2)
   Numerical Value : 21.862979
   EML Subtree     : eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1))),1))),1)
 

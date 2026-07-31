@@ -1,0 +1,370 @@
+=========================================================
+         SYMBOLIC EXPRESSIONS & SUBTREES CATALOG        
+=========================================================
+
+id 0:
+  Type            : Constant
+  Symbolic Value  : 1
+  Numerical Value : 1.000000
+  EML Subtree     : 1
+
+id 1:
+  Type            : Constant
+  Symbolic Value  : e
+  Numerical Value : 2.718282
+  EML Subtree     : eml(1,1)
+
+id 2:
+  Type            : Constant
+  Symbolic Value  : e^e
+  Numerical Value : 15.154262
+  EML Subtree     : eml(eml(1,1),1)
+
+id 3:
+  Type            : Constant
+  Symbolic Value  : 0
+  Numerical Value : 0.000000
+  EML Subtree     : eml(1,eml(eml(1,1),1))
+
+id 4:
+  Type            : Constant
+  Symbolic Value  : +inf
+  Numerical Value : inf
+  EML Subtree     : eml(1,eml(1,eml(eml(1,1),1)))
+
+id 5:
+  Type            : Constant
+  Symbolic Value  : -inf
+  Numerical Value : -inf
+  EML Subtree     : eml(1,eml(1,eml(1,eml(eml(1,1),1))))
+
+id 6:
+  Type            : Constant
+  Symbolic Value  : -1
+  Numerical Value : -1.000000
+  EML Subtree     : eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))
+
+id 7:
+  Type            : Constant
+  Symbolic Value  : e^-1
+  Numerical Value : 0.367879
+  EML Subtree     : eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)
+
+id 8:
+  Type            : Constant
+  Symbolic Value  : 2
+  Numerical Value : 2.000000
+  EML Subtree     : eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1))
+
+id 9:
+  Type            : Constant
+  Symbolic Value  : -ln(2)
+  Numerical Value : -0.693147
+  EML Subtree     : eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))
+
+id 10:
+  Type            : Constant
+  Symbolic Value  : e - ln(-ln(2))
+  Numerical Value : 3.084795 + -3.141593i
+  EML Subtree     : eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1))))
+
+id 11:
+  Type            : Constant
+  Symbolic Value  : e^e/-ln(2)
+  Numerical Value : -21.862979
+  EML Subtree     : eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)
+
+id 12:
+  Type            : Constant
+  Symbolic Value  : ln(-ln(2))
+  Numerical Value : -0.366513 + 3.141593i
+  EML Subtree     : eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1))
+
+id 13:
+  Type            : Constant
+  Symbolic Value  : e - (i * pi)
+  Numerical Value : 2.718282 + -3.141593i
+  EML Subtree     : eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)))
+
+id 14:
+  Type            : Constant
+  Symbolic Value  : e^(e - (i * pi))
+  Numerical Value : -15.154262
+  EML Subtree     : eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1)
+
+id 15:
+  Type            : Constant
+  Symbolic Value  : i * pi
+  Numerical Value : 3.141593i
+  EML Subtree     : eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))
+
+id 16:
+  Type            : Constant
+  Symbolic Value  : e - ln(i * pi)
+  Numerical Value : 1.573552 + -1.570796i
+  EML Subtree     : eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1)))
+
+id 17:
+  Type            : Constant
+  Symbolic Value  : e^e/(i * pi)
+  Numerical Value : -4.823751i
+  EML Subtree     : eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)
+
+id 18:
+  Type            : Constant
+  Symbolic Value  : ln(i * pi)
+  Numerical Value : 1.144730 + 1.570796i
+  EML Subtree     : eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1))
+
+id 19:
+  Type            : Constant
+  Symbolic Value  : i * pi
+  Numerical Value : 3.141593i
+  EML Subtree     : eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)
+
+id 20:
+  Type            : Constant
+  Symbolic Value  : -ln(i * pi)
+  Numerical Value : -1.144730 + -1.570796i
+  EML Subtree     : eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1))
+
+id 21:
+  Type            : Constant
+  Symbolic Value  : e^-ln(i * pi)
+  Numerical Value : -0.318310i
+  EML Subtree     : eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)
+
+id 22:
+  Type            : Constant
+  Symbolic Value  : ln((i * pi)/2)
+  Numerical Value : 0.451583 + 1.570796i
+  EML Subtree     : eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1))
+
+id 23:
+  Type            : Variable Subtree (vars: x23)
+  Symbolic Value  : x23
+  Numerical Value : N/A (Unbound variables)
+  EML Subtree     : x23
+
+id 24:
+  Type            : Variable Subtree (vars: x23)
+  Symbolic Value  : -ln(x23)
+  Numerical Value : N/A (Unbound variables)
+  EML Subtree     : eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),x23)
+
+id 25:
+  Type            : Variable Subtree (vars: x23)
+  Symbolic Value  : e^-ln(x23)
+  Numerical Value : N/A (Unbound variables)
+  EML Subtree     : eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),x23),1)
+
+id 26:
+  Type            : Variable Subtree (vars: x23)
+  Symbolic Value  : (i * pi)/2 + ln(x23)
+  Numerical Value : N/A (Unbound variables)
+  EML Subtree     : eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),x23),1))
+
+id 27:
+  Type            : Variable Subtree (vars: x23)
+  Symbolic Value  : i * x23
+  Numerical Value : N/A (Unbound variables)
+  EML Subtree     : eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),x23),1)),1)
+
+id 28:
+  Type            : Constant
+  Symbolic Value  : (i * pi)/2
+  Numerical Value : 1.570796i
+  EML Subtree     : eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1)
+
+id 29:
+  Type            : Constant
+  Symbolic Value  : i
+  Numerical Value : 1.000000i
+  EML Subtree     : eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1)
+
+id 30:
+  Type            : Constant
+  Symbolic Value  : e^i
+  Numerical Value : 0.540302 + 0.841471i
+  EML Subtree     : eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1),1)
+
+id 31:
+  Type            : Constant
+  Symbolic Value  : -i
+  Numerical Value : -1.000000i
+  EML Subtree     : eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1),1))
+
+id 32:
+  Type            : Constant
+  Symbolic Value  : e + (i * pi)/2
+  Numerical Value : 2.718282 + 1.570796i
+  EML Subtree     : eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1),1)))
+
+id 33:
+  Type            : Constant
+  Symbolic Value  : e^e * i
+  Numerical Value : 15.154262i
+  EML Subtree     : eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1),1))),1)
+
+id 34:
+  Type            : Constant
+  Symbolic Value  : -(i * pi)/2
+  Numerical Value : -1.570796i
+  EML Subtree     : eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1),1))),1))
+
+id 35:
+  Type            : Constant
+  Symbolic Value  : e - ln(-(i * pi)/2)
+  Numerical Value : 2.266699 + 1.570796i
+  EML Subtree     : eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1),1))),1)))
+
+id 36:
+  Type            : Constant
+  Symbolic Value  : e^e/-(i * pi)/2
+  Numerical Value : 9.647503i
+  EML Subtree     : eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1),1))),1))),1)
+
+id 37:
+  Type            : Constant
+  Symbolic Value  : ln(-(i * pi)/2)
+  Numerical Value : 0.451583 + -1.570796i
+  EML Subtree     : eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1),1))),1))),1))
+
+id 38:
+  Type            : Variable Subtree (vars: x23)
+  Symbolic Value  : ln(x23) - ((i * pi)/2)
+  Numerical Value : N/A (Unbound variables)
+  EML Subtree     : eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1),1))),1))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),x23),1))
+
+id 39:
+  Type            : Variable Subtree (vars: x23)
+  Symbolic Value  : x23/i
+  Numerical Value : N/A (Unbound variables)
+  EML Subtree     : eml(eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1),1))),1))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),x23),1)),1)
+
+id 40:
+  Type            : Variable Subtree (vars: x23)
+  Symbolic Value  : e^(x23/i)
+  Numerical Value : N/A (Unbound variables)
+  EML Subtree     : eml(eml(eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1),1))),1))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),x23),1)),1),1)
+
+id 41:
+  Type            : Variable Subtree (vars: x23)
+  Symbolic Value  : e^e^(x23/i)
+  Numerical Value : N/A (Unbound variables)
+  EML Subtree     : eml(eml(eml(eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1),1))),1))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),x23),1)),1),1),1)
+
+id 42:
+  Type            : Variable Subtree (vars: x23)
+  Symbolic Value  : e^(i * x23) - e^(x23/i)
+  Numerical Value : N/A (Unbound variables)
+  EML Subtree     : eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),x23),1)),1),eml(eml(eml(eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1),1))),1))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),x23),1)),1),1),1))
+
+id 43:
+  Type            : Variable Subtree (vars: x23)
+  Symbolic Value  : e - ln(e^(i * x23) - e^(x23/i))
+  Numerical Value : N/A (Unbound variables)
+  EML Subtree     : eml(1,eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),x23),1)),1),eml(eml(eml(eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1),1))),1))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),x23),1)),1),1),1)))
+
+id 44:
+  Type            : Variable Subtree (vars: x23)
+  Symbolic Value  : e^e/(e^(i * x23) - e^(x23/i))
+  Numerical Value : N/A (Unbound variables)
+  EML Subtree     : eml(eml(1,eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),x23),1)),1),eml(eml(eml(eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1),1))),1))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),x23),1)),1),1),1))),1)
+
+id 45:
+  Type            : Variable Subtree (vars: x23)
+  Symbolic Value  : ln(e^(i * x23) - e^(x23/i))
+  Numerical Value : N/A (Unbound variables)
+  EML Subtree     : eml(1,eml(eml(1,eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),x23),1)),1),eml(eml(eml(eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1),1))),1))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),x23),1)),1),1),1))),1))
+
+id 46:
+  Type            : Variable Subtree (vars: x23)
+  Symbolic Value  : e - ln(ln(e^(i * x23) - e^(x23/i)))
+  Numerical Value : N/A (Unbound variables)
+  EML Subtree     : eml(1,eml(1,eml(eml(1,eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),x23),1)),1),eml(eml(eml(eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1),1))),1))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),x23),1)),1),1),1))),1)))
+
+id 47:
+  Type            : Variable Subtree (vars: x23)
+  Symbolic Value  : e^e/ln(e^(i * x23) - e^(x23/i))
+  Numerical Value : N/A (Unbound variables)
+  EML Subtree     : eml(eml(1,eml(1,eml(eml(1,eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),x23),1)),1),eml(eml(eml(eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1),1))),1))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),x23),1)),1),1),1))),1))),1)
+
+id 48:
+  Type            : Variable Subtree (vars: x23)
+  Symbolic Value  : ln(ln(e^(i * x23) - e^(x23/i)))
+  Numerical Value : N/A (Unbound variables)
+  EML Subtree     : eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),x23),1)),1),eml(eml(eml(eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1),1))),1))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),x23),1)),1),1),1))),1))),1))
+
+id 49:
+  Type            : Constant
+  Symbolic Value  : e - ln(2)
+  Numerical Value : 2.025135
+  EML Subtree     : eml(1,eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))
+
+id 50:
+  Type            : Constant
+  Symbolic Value  : e^e/2
+  Numerical Value : 7.577131
+  EML Subtree     : eml(eml(1,eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1))),1)
+
+id 51:
+  Type            : Constant
+  Symbolic Value  : ln(2)
+  Numerical Value : 0.693147
+  EML Subtree     : eml(1,eml(eml(1,eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1))),1))
+
+id 52:
+  Type            : Constant
+  Symbolic Value  : e - ln(ln(2))
+  Numerical Value : 3.084795
+  EML Subtree     : eml(1,eml(1,eml(eml(1,eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1))),1)))
+
+id 53:
+  Type            : Constant
+  Symbolic Value  : e^e/ln(2)
+  Numerical Value : 21.862979
+  EML Subtree     : eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1))),1))),1)
+
+id 54:
+  Type            : Constant
+  Symbolic Value  : ln(ln(2))
+  Numerical Value : -0.366513
+  EML Subtree     : eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1))),1))),1))
+
+id 55:
+  Type            : Constant
+  Symbolic Value  : -(i * pi)/2
+  Numerical Value : -1.570796i
+  EML Subtree     : eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1))
+
+id 56:
+  Type            : Constant
+  Symbolic Value  : e^-(i * pi)/2
+  Numerical Value : -1.000000i
+  EML Subtree     : eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1)),1)
+
+id 57:
+  Type            : Constant
+  Symbolic Value  : ln(2) + (i * pi)/2
+  Numerical Value : 0.693147 + 1.570796i
+  EML Subtree     : eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1))),1))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1)),1))
+
+id 58:
+  Type            : Constant
+  Symbolic Value  : 2i
+  Numerical Value : 2.000000i
+  EML Subtree     : eml(eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1))),1))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1)),1)),1)
+
+id 59:
+  Type            : Variable Subtree (vars: x23)
+  Symbolic Value  : ln((e^(i * x23) - e^(x23/i))/(2i))
+  Numerical Value : N/A (Unbound variables)
+  EML Subtree     : eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),x23),1)),1),eml(eml(eml(eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1),1))),1))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),x23),1)),1),1),1))),1))),1)),eml(eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1))),1))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1)),1)),1))
+
+id 60:
+  Type            : Variable Subtree (vars: x23)
+  Symbolic Value  : (e^(i * x23) - e^(x23/i))/(2i)
+  Numerical Value : N/A (Unbound variables)
+  EML Subtree     : eml(eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),x23),1)),1),eml(eml(eml(eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1),1))),1))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),x23),1)),1),1),1))),1))),1)),eml(eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1))),1))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1)),1)),1)),1)
+

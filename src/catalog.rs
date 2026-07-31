@@ -1,4 +1,5 @@
-//! Symbolic Catalog Engine for identifying and interpreting constant subtrees.
+//! Symbolic Catalog Engine for identifying, evaluating, and interpreting expressions
+//! (both constants and variable subtrees).
 
 use std::collections::HashSet;
 use std::fs::File;
@@ -8,9 +9,16 @@ use rustc_hash::FxHashMap;
 
 use crate::arena::{Interner, Op};
 
-/// Symbolic AST representation used for exact algebraic evaluation and formatting.
+/// Helper to format variable names when node metadata is absent
+fn get_var_name(_interner: &Interner, node_id: u32) -> String {
+    format!("x{}", node_id)
+}
+
+/// Symbolic AST representation used for exact algebraic evaluation, simplification, and formatting.
 #[derive(Debug, Clone, PartialEq)]
 pub enum SymbolicExpr {
+    /// Symbolic variable (e.g., "x", "x1")
+    Var(String),
     Num(i64),
     Float(f64),
     Complex(Complex64),
@@ -32,6 +40,7 @@ impl SymbolicExpr {
     /// Formats the symbolic expression cleanly with strict order-of-operations parentheses.
     pub fn format_clean(&self) -> String {
         match self {
+            SymbolicExpr::Var(name) => name.clone(),
             SymbolicExpr::Num(n) => format!("{}", n),
             SymbolicExpr::Float(f) => format!("{:.4}", f),
             SymbolicExpr::Complex(c) => {
@@ -62,6 +71,7 @@ impl SymbolicExpr {
                 (SymbolicExpr::Num(1), SymbolicExpr::I) | (SymbolicExpr::I, SymbolicExpr::Num(1)) => "i".to_string(),
                 (SymbolicExpr::Num(-1), SymbolicExpr::I) | (SymbolicExpr::I, SymbolicExpr::Num(-1)) => "-i".to_string(),
                 (SymbolicExpr::Num(n), SymbolicExpr::I) | (SymbolicExpr::I, SymbolicExpr::Num(n)) => format!("{}i", n),
+                (SymbolicExpr::Num(1), x) | (x, SymbolicExpr::Num(1)) => x.format_clean(),
                 _ => format!("{} * {}", a.format_parenthesized(), b.format_parenthesized()),
             },
 
@@ -82,10 +92,20 @@ impl SymbolicExpr {
     }
 }
 
-/// Evaluates an interner EML node directly to a complex float: eml(a, b) = exp(a) - ln(b).
+/// Evaluates an interner EML node directly to a complex float.
 pub fn eval_numerical_direct(
     interner: &Interner,
     node_id: u32,
+    memo: &mut FxHashMap<u32, Complex64>,
+) -> Complex64 {
+    eval_numerical_env(interner, node_id, &FxHashMap::default(), memo)
+}
+
+/// Evaluates an interner EML node directly to a complex float with variable bindings.
+pub fn eval_numerical_env(
+    interner: &Interner,
+    node_id: u32,
+    env: &FxHashMap<u32, Complex64>,
     memo: &mut FxHashMap<u32, Complex64>,
 ) -> Complex64 {
     if let Some(&val) = memo.get(&node_id) {
@@ -94,11 +114,14 @@ pub fn eval_numerical_direct(
 
     let node = interner.node(node_id);
     let val = match node.op {
-        Op::Var => panic!("Cannot evaluate variable node numerically as constant"),
+        Op::Var => {
+            *env.get(&node_id)
+                .unwrap_or_else(|| panic!("Unbound variable at node_id {} during evaluation", node_id))
+        }
         Op::Const => node.const_val.expect("Const node missing val"),
         Op::Prim => {
-            let a_val = eval_numerical_direct(interner, node.a, memo);
-            let b_val = eval_numerical_direct(interner, node.b, memo);
+            let a_val = eval_numerical_env(interner, node.a, env, memo);
+            let b_val = eval_numerical_env(interner, node.b, env, memo);
             a_val.exp() - b_val.ln()
         }
     };
@@ -107,14 +130,19 @@ pub fn eval_numerical_direct(
     val
 }
 
-pub fn interpret_symbolic(interner: &Interner, node_id: u32, memo: &mut FxHashMap<u32, SymbolicExpr>) -> SymbolicExpr {
+/// Interprets an AST node into a symbolic expression, handling constants and variables.
+pub fn interpret_symbolic(
+    interner: &Interner,
+    node_id: u32,
+    memo: &mut FxHashMap<u32, SymbolicExpr>,
+) -> SymbolicExpr {
     if let Some(expr) = memo.get(&node_id) {
         return expr.clone();
     }
 
     let node = interner.node(node_id);
     let raw_expr = match node.op {
-        Op::Var => panic!("Cannot interpret variable node symbolically as constant"),
+        Op::Var => SymbolicExpr::Var(get_var_name(interner, node_id)),
         Op::Const => {
             let val = node.const_val.expect("Const node missing val");
             if val.im == 0.0 {
@@ -175,6 +203,11 @@ fn simplify_pass(expr: SymbolicExpr) -> SymbolicExpr {
                     let ln_b = simplify_pass(SymbolicExpr::Ln(b));
                     simplify_pass(SymbolicExpr::Add(Box::new(ln_a), Box::new(ln_b)))
                 }
+                SymbolicExpr::Div(a, b) if matches!(a.as_ref(), SymbolicExpr::Exp(_)) || matches!(b.as_ref(), SymbolicExpr::Exp(_)) => {
+                    let ln_a = simplify_pass(SymbolicExpr::Ln(a));
+                    let ln_b = simplify_pass(SymbolicExpr::Ln(b));
+                    simplify_pass(SymbolicExpr::Sub(Box::new(ln_a), Box::new(ln_b)))
+                }
                 other => SymbolicExpr::Ln(Box::new(other)),
             }
         }
@@ -188,8 +221,18 @@ fn simplify_pass(expr: SymbolicExpr) -> SymbolicExpr {
                 SymbolicExpr::Inf(true) => SymbolicExpr::Inf(true),
                 SymbolicExpr::Inf(false) => SymbolicExpr::Num(0),
                 SymbolicExpr::Mul(a, b) if matches!((a.as_ref(), b.as_ref()), (SymbolicExpr::I, SymbolicExpr::Pi) | (SymbolicExpr::Pi, SymbolicExpr::I)) => SymbolicExpr::Num(-1),
-                SymbolicExpr::Div(a, b) if matches!((b.as_ref()), (SymbolicExpr::Num(2))) && matches!(a.as_ref(), SymbolicExpr::Mul(x, y) if matches!((x.as_ref(), y.as_ref()), (SymbolicExpr::I, SymbolicExpr::Pi) | (SymbolicExpr::Pi, SymbolicExpr::I))) => SymbolicExpr::I,
+                SymbolicExpr::Div(a, b) if matches!(b.as_ref(), SymbolicExpr::Num(2)) && matches!(a.as_ref(), SymbolicExpr::Mul(x, y) if matches!((x.as_ref(), y.as_ref()), (SymbolicExpr::I, SymbolicExpr::Pi) | (SymbolicExpr::Pi, SymbolicExpr::I))) => SymbolicExpr::I,
                 SymbolicExpr::Add(a, b) => simplify_pass(SymbolicExpr::Mul(Box::new(SymbolicExpr::Exp(a)), Box::new(SymbolicExpr::Exp(b)))),
+                SymbolicExpr::Add(a, b) if matches!(a.as_ref(), SymbolicExpr::Ln(_)) || matches!(b.as_ref(), SymbolicExpr::Ln(_)) => {
+                    let exp_a = simplify_pass(SymbolicExpr::Exp(a));
+                    let exp_b = simplify_pass(SymbolicExpr::Exp(b));
+                    simplify_pass(SymbolicExpr::Mul(Box::new(exp_a), Box::new(exp_b)))
+                }
+                SymbolicExpr::Sub(a, b) if matches!(a.as_ref(), SymbolicExpr::Ln(_)) || matches!(b.as_ref(), SymbolicExpr::Ln(_)) => {
+                    let exp_a = simplify_pass(SymbolicExpr::Exp(a));
+                    let exp_b = simplify_pass(SymbolicExpr::Exp(b));
+                    simplify_pass(SymbolicExpr::Div(Box::new(exp_a), Box::new(exp_b)))
+                }
                 other => SymbolicExpr::Exp(Box::new(other)),
             }
         }
@@ -295,6 +338,7 @@ fn simplify_pass(expr: SymbolicExpr) -> SymbolicExpr {
     }
 }
 
+/// Checks if a subtree is strictly constant (contains no variables).
 pub fn is_constant_node(interner: &Interner, node_id: u32, memo: &mut FxHashMap<u32, bool>) -> bool {
     if let Some(&res) = memo.get(&node_id) {
         return res;
@@ -313,10 +357,40 @@ pub fn is_constant_node(interner: &Interner, node_id: u32, memo: &mut FxHashMap<
     res
 }
 
+/// Collects the set of variable node IDs present in a given subtree.
+pub fn get_subtree_vars(
+    interner: &Interner,
+    node_id: u32,
+    memo: &mut FxHashMap<u32, HashSet<u32>>,
+) -> HashSet<u32> {
+    if let Some(vars) = memo.get(&node_id) {
+        return vars.clone();
+    }
+
+    let node = interner.node(node_id);
+    let vars = match node.op {
+        Op::Var => {
+            let mut s = HashSet::new();
+            s.insert(node_id);
+            s
+        }
+        Op::Const => HashSet::new(),
+        Op::Prim => {
+            let left_vars = get_subtree_vars(interner, node.a, memo);
+            let right_vars = get_subtree_vars(interner, node.b, memo);
+            left_vars.union(&right_vars).cloned().collect()
+        }
+    };
+
+    memo.insert(node_id, vars.clone());
+    vars
+}
+
+/// Formats an EML tree string recursively.
 fn to_eml_string(interner: &Interner, node_id: u32) -> String {
     let node = interner.node(node_id);
     match node.op {
-        Op::Var => "x".to_string(),
+        Op::Var => get_var_name(interner, node_id),
         Op::Const => {
             let val = node.const_val.expect("Const missing value");
             if val.im == 0.0 {
@@ -337,6 +411,7 @@ fn to_eml_string(interner: &Interner, node_id: u32) -> String {
     }
 }
 
+/// Legacy / Backward-compatible constant catalog exporter called by main.rs.
 pub fn export_constant_catalog(interner: &Interner, root_id: u32, filename: &str) {
     let mut is_const_memo = FxHashMap::default();
     let mut sym_memo = FxHashMap::default();
@@ -388,4 +463,78 @@ pub fn export_constant_catalog(interner: &Interner, root_id: u32, filename: &str
     }
 
     println!("Symbolic constant catalog saved to `{}`!", filename);
+}
+
+/// Extended catalog exporter that supports variable-dependent subtrees.
+pub fn export_symbolic_catalog(
+    interner: &Interner,
+    root_id: u32,
+    env: &FxHashMap<u32, Complex64>,
+    filename: &str,
+) {
+    let mut vars_memo = FxHashMap::default();
+    let mut sym_memo = FxHashMap::default();
+    let mut num_memo = FxHashMap::default();
+    let mut visited = HashSet::new();
+    let mut catalog = Vec::new();
+
+    let mut stack = vec![root_id];
+    while let Some(node_id) = stack.pop() {
+        if !visited.insert(node_id) {
+            continue;
+        }
+
+        let vars = get_subtree_vars(interner, node_id, &mut vars_memo);
+        let sym_val = interpret_symbolic(interner, node_id, &mut sym_memo);
+        let eml_repr = to_eml_string(interner, node_id);
+
+        let num_val = if vars.iter().all(|v_id| env.contains_key(v_id)) {
+            Some(eval_numerical_env(interner, node_id, env, &mut num_memo))
+        } else {
+            None
+        };
+
+        catalog.push((node_id, vars, sym_val, num_val, eml_repr));
+
+        let node = interner.node(node_id);
+        if node.op == Op::Prim {
+            stack.push(node.a);
+            stack.push(node.b);
+        }
+    }
+
+    catalog.sort_by_key(|(id, _, _, _, _)| *id);
+
+    let mut file = File::create(filename).expect("Failed to create catalog file");
+    writeln!(file, "=========================================================").unwrap();
+    writeln!(file, "         SYMBOLIC EXPRESSIONS & SUBTREES CATALOG        ").unwrap();
+    writeln!(file, "=========================================================\n").unwrap();
+
+    for (id, vars, sym_val, num_val, eml_repr) in catalog {
+        writeln!(file, "id {}:", id).unwrap();
+        if vars.is_empty() {
+            writeln!(file, "  Type            : Constant").unwrap();
+        } else {
+            let var_names: Vec<String> = vars.iter().map(|&v| get_var_name(interner, v)).collect();
+            writeln!(file, "  Type            : Variable Subtree (vars: {})", var_names.join(", ")).unwrap();
+        }
+        
+        writeln!(file, "  Symbolic Value  : {}", sym_val.format_clean()).unwrap();
+        
+        if let Some(val) = num_val {
+            if val.im.abs() < 1e-12 {
+                writeln!(file, "  Numerical Value : {:.6}", val.re).unwrap();
+            } else if val.re.abs() < 1e-12 {
+                writeln!(file, "  Numerical Value : {:.6}i", val.im).unwrap();
+            } else {
+                writeln!(file, "  Numerical Value : {:.6} + {:.6}i", val.re, val.im).unwrap();
+            }
+        } else {
+            writeln!(file, "  Numerical Value : N/A (Unbound variables)").unwrap();
+        }
+
+        writeln!(file, "  EML Subtree     : {}\n", eml_repr).unwrap();
+    }
+
+    println!("Symbolic catalog saved to `{}`!", filename);
 }
