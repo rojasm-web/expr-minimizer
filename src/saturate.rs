@@ -1,14 +1,20 @@
 //! Equality-saturation harness built on the `egg` crate.
 //!
 //! This module is deliberately generic over the *rule set*: rules are data
-//! (`Vec<Rewrite<L, ()>>`), loaded from `rules.rs`, so the search code never
-//! hardcodes a specific algebraic identity. `saturate.rs` only knows how to
-//! (a) translate the arena IR into egg's `RecExpr`, (b) run saturation, and
-//! (c) extract a minimal-cost result by a pluggable cost function.
+//! (`Vec<Rewrite<L, ConstFold>>`), loaded from `rules.rs`, so the search code
+//! never hardcodes a specific algebraic identity. `saturate.rs` only knows
+//! how to (a) translate the arena IR into egg's `RecExpr`, (b) run
+//! saturation -- now paired with an e-class `Analysis` that partially
+//! evaluates constant subtrees, so numerically-equal-but-syntactically-
+//! unrelated constants get merged even when no rewrite rule connects them
+//! -- and (c) extract a minimal-cost result by a pluggable cost function.
 
 use std::time::Duration;
 
-use egg::{define_language, CostFunction, Extractor, Id, Language, RecExpr, Rewrite, Runner};
+use egg::{
+    define_language, Analysis, CostFunction, DidMerge, EGraph, Extractor, Id, Language, RecExpr,
+    Rewrite, Runner,
+};
 use num_complex::Complex64;
 
 use crate::arena::{Arena, Interner, Op as ArenaOp, NIL};
@@ -40,7 +46,7 @@ impl std::str::FromStr for ConstId {
 
 /// Side table mapping `ConstId -> Complex64`, shared between the arena and
 /// the egg `Language` translation so constant identity survives round-trips.
-#[derive(Default, Clone)]
+#[derive(Default, Clone, Debug)]
 pub struct ConstTable {
     values: Vec<Complex64>,
 }
@@ -50,11 +56,32 @@ impl ConstTable {
         Self::default()
     }
 
+    /// Exact-bit-pattern lookup/insert. Used for the initial arena -> egg
+    /// translation, where two constants should only be considered "the
+    /// same" if they really are bit-identical.
     pub fn intern(&mut self, v: Complex64) -> ConstId {
-        // Exact-bit-pattern lookup, mirroring Interner::intern_const.
         if let Some(pos) = self.values.iter().position(|&existing| {
             existing.re.to_bits() == v.re.to_bits() && existing.im.to_bits() == v.im.to_bits()
         }) {
+            return ConstId(pos as u32);
+        }
+        let id = ConstId(self.values.len() as u32);
+        self.values.push(v);
+        id
+    }
+
+    /// Like `intern`, but treats two values as "the same constant" once
+    /// they're within `tol` of each other (Euclidean distance in the
+    /// complex plane), instead of requiring an exact bit-pattern match.
+    ///
+    /// This is what lets `ConstFold` merge e.g. two independently-derived
+    /// `i*pi` subtrees: they reach the same mathematical value via
+    /// different floating-point paths, so their bit patterns won't match
+    /// exactly, but `intern_approx` still hands back the *same* `ConstId` --
+    /// and therefore the same interned `L::Const` e-node, and therefore
+    /// the same e-class.
+    pub fn intern_approx(&mut self, v: Complex64, tol: f64) -> ConstId {
+        if let Some(pos) = self.values.iter().position(|&existing| (existing - v).norm() <= tol) {
             return ConstId(pos as u32);
         }
         let id = ConstId(self.values.len() as u32);
@@ -74,6 +101,105 @@ define_language! {
         "f" = Prim([Id; 2]),
         Const(ConstId),
         "x" = Var,
+    }
+}
+
+/// Float tolerance used when deciding two folded constant values count as
+/// "the same" for e-class merging. `1e-12` is comfortably above f64's ULP
+/// noise floor for the kind of exp/ln chains this language produces, while
+/// still tight enough that it won't accidentally conflate two genuinely
+/// different constants.
+pub const CONST_FOLD_TOLERANCE: f64 = 1e-12;
+
+/// Default cap on total e-graph size passed to `Runner::with_node_limit`.
+/// `ConstFold::modify` adds at most one new node per e-class whose value
+/// becomes known, and `ConstTable::intern_approx` dedups re-discoveries of
+/// the same folded value onto one shared `ConstId` -- so graph growth from
+/// folding scales with the number of *distinct* folded values reachable,
+/// not with the number of rewrite iterations. Still worth a hard ceiling
+/// so a pathological interaction (or a future unsound rule) can't grow the
+/// graph unboundedly.
+pub const DEFAULT_NODE_LIMIT: usize = 50_000;
+
+/// Default cap on saturation iterations, independent of the node-count
+/// cap -- bounds rewrite-application work even in a run that stays small
+/// but keeps discovering marginally different equivalents each pass.
+pub const DEFAULT_ITER_LIMIT: usize = 60;
+
+/// `egg::Analysis` that partially evaluates `f(a, b) = exp(a) - log(b)`
+/// bottom-up: any e-class whose subtree contains no `Var` collapses to a
+/// concrete `Complex64`.
+///
+/// Whenever an e-class's folded value becomes known, `modify` interns a
+/// canonical constant node for that value -- via `ConstTable::intern_approx`,
+/// so near-equal floats reached via different rewrite paths share one
+/// `ConstId` -- and unions it into the class. This is what lets two
+/// differently-shaped constant subtrees (e.g. one that's `f`-nested down to
+/// `i*pi`, and one that's a literal `i*pi` constant) land in the same
+/// e-class: there's no syntactic rewrite *rule* connecting those two node
+/// shapes, and pure rewriting will never discover the connection on its
+/// own within any iteration/node budget -- it's only true because of what
+/// they evaluate to, which is exactly what this analysis checks instead of
+/// relying on rewriting to stumble onto it.
+#[derive(Debug, Clone, Default)]
+pub struct ConstFold {
+    pub consts: ConstTable,
+}
+
+impl ConstFold {
+    pub fn new(consts: ConstTable) -> Self {
+        ConstFold { consts }
+    }
+}
+
+impl Analysis<L> for ConstFold {
+    type Data = Option<Complex64>;
+
+    fn make(egraph: &EGraph<L, ConstFold>, enode: &L) -> Self::Data {
+        let value = |i: &Id| egraph[*i].data;
+        match enode {
+            L::Var => None,
+            L::Const(cid) => Some(egraph.analysis.consts.get(*cid)),
+            L::Prim([a, b]) => {
+                let va = value(a)?;
+                let vb = value(b)?;
+                Some(va.exp() - vb.ln())
+            }
+        }
+    }
+
+    fn merge(&mut self, a: &mut Self::Data, b: Self::Data) -> DidMerge {
+        match (&*a, &b) {
+            (Some(_), None) => DidMerge(false, true),
+            (None, Some(_)) => {
+                *a = b;
+                DidMerge(true, false)
+            }
+            (None, None) => DidMerge(false, false),
+            (Some(av), Some(bv)) => {
+                // Two enodes in the same e-class folding to genuinely
+                // different values would mean an unsound rewrite equated
+                // them -- not something this analysis can fix, but worth
+                // surfacing loudly in debug builds rather than silently
+                // picking one.
+                debug_assert!(
+                    (av - bv).norm() <= CONST_FOLD_TOLERANCE * 1e3,
+                    "e-class merge of two different constant folds ({av} vs {bv}) -- \
+                     this points at an unsound rewrite rule, not a bug in ConstFold"
+                );
+                DidMerge(false, false)
+            }
+        }
+    }
+
+    fn modify(egraph: &mut EGraph<L, ConstFold>, id: Id) {
+        if let Some(val) = egraph[id].data {
+            if val.re.is_finite() && val.im.is_finite() {
+                let cid = egraph.analysis.consts.intern_approx(val, CONST_FOLD_TOLERANCE);
+                let added = egraph.add(L::Const(cid));
+                egraph.union(id, added);
+            }
+        }
     }
 }
 
@@ -174,36 +300,52 @@ impl CostFunction<L> for ByteSizeCost {
     }
 }
 
-/// Run equality saturation on `expr` using `rules`, within `time_budget`,
-/// then extract the minimal-cost equivalent expression under `OpCountCost`.
-pub fn minimize(expr: RecExpr<L>, rules: &[Rewrite<L, ()>], time_budget: Duration) -> RecExpr<L> {
-    let runner = Runner::default()
+/// Run equality saturation on `expr` using `rules` and a `ConstFold`
+/// analysis seeded from `consts`, within `time_budget`, then extract the
+/// minimal-cost equivalent expression under `OpCountCost`.
+///
+/// Returns the extracted expression *and* the (possibly-grown) constant
+/// table: `ConstFold::modify` may have interned new folded constants
+/// during the run, and callers need those to translate the result back to
+/// the arena IR via `recexpr_to_arena`.
+pub fn minimize(
+    expr: RecExpr<L>,
+    rules: &[Rewrite<L, ConstFold>],
+    consts: ConstTable,
+    time_budget: Duration,
+) -> (RecExpr<L>, ConstTable) {
+    let runner = Runner::<L, ConstFold>::new(ConstFold::new(consts))
         .with_expr(&expr)
         .with_time_limit(time_budget)
+        .with_node_limit(DEFAULT_NODE_LIMIT)
+        .with_iter_limit(DEFAULT_ITER_LIMIT)
         .run(rules);
     let extractor = Extractor::new(&runner.egraph, OpCountCost);
     let (_best_cost, best) = extractor.find_best(runner.roots[0]);
-    best
+    (best, runner.egraph.analysis.consts.clone())
 }
 
 /// Same as `minimize`, but with a caller-supplied cost function, so callers
 /// can swap in `ByteSizeCost` or any other `CostFunction<L>` impl.
 pub fn minimize_with_cost<CF>(
     expr: RecExpr<L>,
-    rules: &[Rewrite<L, ()>],
+    rules: &[Rewrite<L, ConstFold>],
+    consts: ConstTable,
     time_budget: Duration,
     cost_fn: CF,
-) -> RecExpr<L>
+) -> (RecExpr<L>, ConstTable)
 where
     CF: CostFunction<L>,
 {
-    let runner = Runner::default()
+    let runner = Runner::<L, ConstFold>::new(ConstFold::new(consts))
         .with_expr(&expr)
         .with_time_limit(time_budget)
+        .with_node_limit(DEFAULT_NODE_LIMIT)
+        .with_iter_limit(DEFAULT_ITER_LIMIT)
         .run(rules);
     let extractor = Extractor::new(&runner.egraph, cost_fn);
     let (_best_cost, best) = extractor.find_best(runner.roots[0]);
-    best
+    (best, runner.egraph.analysis.consts.clone())
 }
 
 #[cfg(test)]
@@ -237,9 +379,45 @@ mod tests {
         let mut consts = ConstTable::new();
         let expr = arena_to_recexpr(&interner, root, &mut consts);
         let rules = placeholder_rules();
-        let out = minimize(expr, &rules, Duration::from_millis(200));
+        let (out, _consts) = minimize(expr, &rules, consts, Duration::from_millis(200));
         // With placeholder rules this may or may not shrink; the point of
         // this test is that the harness runs to completion without panicking.
         assert!(!out.as_ref().is_empty());
+    }
+
+    #[test]
+    fn const_fold_unifies_equal_values_from_different_shapes() {
+        // f(0, -1) = exp(0) - ln(-1) = 1 - i*pi. Build that as a `Prim`
+        // tree, and separately build a literal `Const` equal to the same
+        // value, as two independent `RecExpr`s, then add both into one
+        // e-graph. Nothing in `rules.rs` relates these two node shapes
+        // syntactically -- only `ConstFold::modify` can discover they're
+        // equal, which is exactly the ID-15/ID-19 `i*pi` scenario this
+        // analysis exists to fix.
+        let mut consts = ConstTable::new();
+        let zero = consts.intern(Complex64::new(0.0, 0.0));
+        let neg_one = consts.intern(Complex64::new(-1.0, 0.0));
+        let expected = Complex64::new(0.0, 0.0).exp() - Complex64::new(-1.0, 0.0).ln();
+        let literal = consts.intern(expected);
+
+        let mut computed_expr = RecExpr::default();
+        let c_zero = computed_expr.add(L::Const(zero));
+        let c_neg_one = computed_expr.add(L::Const(neg_one));
+        computed_expr.add(L::Prim([c_zero, c_neg_one]));
+
+        let mut literal_expr = RecExpr::default();
+        literal_expr.add(L::Const(literal));
+
+        let analysis = ConstFold::new(consts);
+        let mut egraph: EGraph<L, ConstFold> = EGraph::new(analysis);
+        let computed_id = egraph.add_expr(&computed_expr);
+        let literal_id = egraph.add_expr(&literal_expr);
+        egraph.rebuild();
+
+        assert_eq!(
+            egraph.find(computed_id),
+            egraph.find(literal_id),
+            "f(0, -1) and its literal folded value should land in the same e-class"
+        );
     }
 }
