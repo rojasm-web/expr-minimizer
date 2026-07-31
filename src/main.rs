@@ -18,11 +18,14 @@ pub mod saturate;
 pub mod stochastic;
 pub mod catalog;
 
-use egg::StopReason;
+use egg::{Runner, StopReason};
 
 use arena::{Arena, Interner};
 use fingerprint::sample_bytes;
-use saturate::{arena_to_recexpr, recexpr_to_arena, ConstTable, OpCountCost};
+use saturate::{
+    arena_to_recexpr, recexpr_to_arena, ConstFold, ConstTable, OpCountCost, DEFAULT_ITER_LIMIT,
+    DEFAULT_NODE_LIMIT, L,
+};
 
 /// Copy every node of `src` into a fresh, hash-consed `Interner`, returning
 /// the interner plus an `old_id -> new_id` mapping. Because `src` is
@@ -54,10 +57,11 @@ fn rehydrate(src: &Arena) -> (Interner, Vec<u32>) {
 /// `budget` total. Strategy:
 ///
 /// 1. Rehydrate the input arena into a hash-consed `Interner`.
-/// 2. Run equality saturation (`saturate::minimize`) with a slice of the
-///    budget. If the runner reports it saturated (fully explored the
-///    equivalence class under the given rules) before the time limit, its
-///    extraction result is trusted directly.
+/// 2. Run equality saturation, paired with the `ConstFold` e-class
+///    analysis (see `saturate.rs`), with a slice of the budget. If the
+///    runner reports it saturated (fully explored the equivalence class
+///    under the given rules, not just hit a time/node/iteration limit)
+///    before any limit, its extraction result is trusted directly.
 /// 3. Otherwise -- saturation didn't converge -- spend the remaining
 ///    budget on the stochastic fallback search (`stochastic::search`),
 ///    seeded from whatever equality saturation already found, targeting
@@ -80,12 +84,27 @@ pub fn minimize_expr(expr: &Arena, root: u32, budget: Duration) -> (Arena, u32, 
     let rec_expr = arena_to_recexpr(&interner, root, &mut consts);
     let rules = rules::placeholder_rules();
 
-    let runner = egg::Runner::default()
+    // Node/iteration limits sit alongside the time limit so that
+    // ConstFold's constant-merging can't run away with the graph size --
+    // see saturate::DEFAULT_NODE_LIMIT / DEFAULT_ITER_LIMIT for why those
+    // particular defaults are safe headroom rather than arbitrary caps.
+    // Hitting any of the three limits (time, nodes, iterations) without
+    // reaching `StopReason::Saturated` is treated identically below: the
+    // extraction still happens, but it isn't trusted without the
+    // fingerprint check, and the stochastic fallback still gets a turn.
+    let runner = Runner::<L, ConstFold>::new(ConstFold::new(consts))
         .with_expr(&rec_expr)
         .with_time_limit(saturation_budget)
+        .with_node_limit(DEFAULT_NODE_LIMIT)
+        .with_iter_limit(DEFAULT_ITER_LIMIT)
         .run(&rules);
 
     let saturated = matches!(runner.stop_reason, Some(StopReason::Saturated));
+
+    // `ConstFold::modify` may have interned new folded constants during
+    // the run (e.g. a freshly-discovered `i*pi`), so pull the updated
+    // table back out rather than reusing the pre-run `consts`.
+    let consts = runner.egraph.analysis.consts.clone();
 
     let extractor = egg::Extractor::new(&runner.egraph, OpCountCost);
     let (_cost, best_rec_expr) = extractor.find_best(runner.roots[0]);
