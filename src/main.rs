@@ -17,6 +17,7 @@ pub mod rules;
 pub mod saturate;
 pub mod stochastic;
 pub mod catalog;
+pub mod config;
 
 use egg::{Runner, StopReason};
 
@@ -233,8 +234,9 @@ fn main() {
     let mut interner = Interner::new();
 
     // 1. Parse input expression
-    let input_str = "eml(eml(eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(eml(1,eml(eml(1,eml(1,eml(eml(1,1),1))),1)),eml(eml(1,eml(eml(1,eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(eml(1,eml(1,eml(eml(1,1),1))),1)),eml(1,1)),1))),1)),1)),1)),1))),1)),eml(eml(eml(1,eml(eml(1,eml(1,eml(eml(1,1),1))),1)),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(eml(1,1),1))),1)),eml(1,1))),1))),1)),1)),1)),1),1)";
-    let root = parser::parse(&mut interner, input_str).expect("valid expression");
+    let input_str = "eml(eml(eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(eml(1,eml(eml(1,eml(1,eml(eml(1,1),1))),1)),eml(eml(1,eml(eml(1,eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(eml(1,eml(1,e[...]")
+        .to_string();
+    let root = parser::parse(&mut interner, &input_str).expect("valid expression");
 
     println!("=== INPUT EML TREE ===");
     print_tree(&interner, root, 0);
