@@ -12,6 +12,9 @@ rayon = "1.8"
 xxhash-rust = { version = "0.8", features = ["xxh3"] }
 num-complex = "0.4"
 rand = "0.8"
+regex = "1.9"
+plotters = "0.3"
+plotters-backend = "0.3"
 
 [profile.release]
 opt-level = 3
