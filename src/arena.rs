@@ -7,6 +7,8 @@
 use num_complex::Complex64;
 use rustc_hash::FxHashMap;
 
+use crate::config::MACHINE_TOLERANCE;
+
 /// Sentinel for "no child" (used by leaf nodes).
 pub const NIL: u32 = u32::MAX;
 
@@ -74,17 +76,6 @@ impl Arena {
     }
 }
 
-/// Exact bit-pattern key for a complex constant, used so that interning is a
-/// pure structural/bitwise operation with no float-equality ambiguity.
-type ConstKey = (u64, u64, u64);
-
-fn const_key(v: Complex64) -> ConstKey {
-    // Fold in a type tag (0) so this can share a table shape with the
-    // (Op, u32, u32) prim/var keys if ever unified; here it's just used
-    // as its own lookup key.
-    (0, v.re.to_bits(), v.im.to_bits())
-}
-
 /// Hash-consing interner: wraps arena insertion so that structurally
 /// identical subexpressions always resolve to the same node ID.
 ///
@@ -94,8 +85,11 @@ pub struct Interner {
     pub arena: Arena,
     /// Keyed on (op, a, b) for Prim nodes.
     prim_table: FxHashMap<(u32, u32), u32>,
-    /// Keyed on the exact bit pattern of the constant.
-    const_table: FxHashMap<ConstKey, u32>,
+    /// List of (const_value, id). We use an approximate equality test when
+    /// deciding whether two constants are the "same" so that floating-point
+    /// roundoff won't secretly create distinct nodes for mathematically
+    /// identical values produced by different evaluation paths.
+    const_table: Vec<(Complex64, u32)>,
     /// At most one canonical Var node ever exists.
     var_id: Option<u32>,
 }
@@ -105,7 +99,7 @@ impl Interner {
         Interner {
             arena: Arena::new(),
             prim_table: FxHashMap::default(),
-            const_table: FxHashMap::default(),
+            const_table: Vec::new(),
             var_id: None,
         }
     }
@@ -121,14 +115,18 @@ impl Interner {
         id
     }
 
-    /// Intern a literal constant by its exact bit pattern.
+    /// Intern a literal constant using a tolerance so near-equal floating
+    /// values canonicalize to the same node. This aligns arena-level
+    /// constant equality with the rest of the pipeline's numerical
+    /// tolerance.
     pub fn intern_const(&mut self, v: Complex64) -> u32 {
-        let key = const_key(v);
-        if let Some(&id) = self.const_table.get(&key) {
-            return id;
+        for &mut (ref existing, id) in &mut self.const_table.iter_mut() {
+            if (existing - v).norm() <= MACHINE_TOLERANCE {
+                return id;
+            }
         }
         let id = self.arena.push(Node::constant(v));
-        self.const_table.insert(key, id);
+        self.const_table.push((v, id));
         id
     }
 
