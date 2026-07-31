@@ -234,7 +234,7 @@ fn main() {
     let mut interner = Interner::new();
 
     // 1. Parse input expression
-    let input_str = "eml(eml(eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(eml(1,eml(eml(1,eml(1,eml(eml(1,1),1))),1)),eml(eml(1,eml(eml(1,eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(eml(1,eml(1,e[...]")
+    let input_str = "eml(eml(eml(eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,1),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1)),1)))),1)),eml(eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(eml(1,eml(eml(1,eml(1,eml(eml(1,eml(eml(1,eml(1,eml(1,eml(eml(1,1),1)))),eml(1,1))),1))),1)),1)),1)),1),1)"
         .to_string();
     let root = parser::parse(&mut interner, &input_str).expect("valid expression");
 
