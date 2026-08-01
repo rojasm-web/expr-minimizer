@@ -9,6 +9,9 @@
 //!   cargo run --bin plot_eml_from_catalog -- --id 52 --catalog constants_catalog.txt --out id52_plot.png
 //!
 //! The evaluator implements the repo semantics: eml(a,b) = exp(a) - ln(b).
+#[path = "../config.rs"]
+pub mod config;
+
 use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
@@ -263,6 +266,16 @@ mod tests {
         assert!((value.re - (std::f64::consts::E)).abs() < 1e-9);
         assert!((value.im + std::f64::consts::PI).abs() < 1e-9);
     }
+
+    #[test]
+    fn rolling_mean_window_grows_with_distance_from_zero() {
+        let values = vec![1.0, 2.0, 3.0, 4.0];
+        let xs = vec![-10.0, -5.0, 0.0, 10.0];
+        let smoothed = rolling_mean(&values, &xs, 2, 1.0);
+        assert_eq!(smoothed.len(), values.len());
+        assert!(smoothed[0].is_finite());
+        assert!(smoothed[3].is_finite());
+    }
 }
 
 /// Read the catalog and extract (symbolic_value, eml_subtree) for a given id.
@@ -507,16 +520,79 @@ fn linspace(xmin: f64, xmax: f64, n: usize) -> Vec<f64> {
     (0..n).map(|i| xmin + (i as f64) * step).collect()
 }
 
+/// Smooths |EML - Symbolic| error data for plotting.
+///
+/// Design choices for this use case:
+/// - Windowing is done in x-distance, not index count, so it's correct even if
+///   `xs` isn't uniformly spaced.
+/// - Boundaries use reflection padding instead of shrinking, so edge points
+///   (x = ±10, where your error is largest) aren't biased by a lopsided window.
+/// - Uses a *median* within each window, not a mean. Your raw data is spiky
+///   (vertical jitter between ULP bands) — a mean gets dragged around by
+///   isolated spikes, a median tracks the "typical band" the error sits in.
+/// - Smoothing is done in log-space. Error values span ~0 to 1e-15 and the
+///   process is multiplicative/ULP-quantized in nature, not additive — log
+///   space keeps a spike near x=0 (where true error is ~1e-17) from being
+///   swamped by neighboring 1e-15 values the way a linear mean would.
+/// - Window width still grows with |x| (your original intent: trust the
+///   center more, smooth the noisier tails more), but is now expressed as
+///   an x-distance fraction, decoupled from sample spacing.
+fn rolling_mean(
+    values: &[f64],
+    xs: &[f64],
+    base_half_width_frac: f64,
+    edge_growth: f64,
+) -> Vec<f64> {
+    let n = values.len();
+    if n == 0 { return vec![]; }
+
+    let x_min = xs.iter().cloned().fold(f64::INFINITY, f64::min);
+    let x_max = xs.iter().cloned().fold(f64::NEG_INFINITY, f64::max);
+    let x_range = (x_max - x_min).max(f64::EPSILON);
+    let x_mid = 0.5 * (x_min + x_max);
+    let max_abs_dist = (x_range / 2.0).max(f64::EPSILON);
+
+    let floor = 1e-18;
+    let log_vals: Vec<f64> = values.iter().map(|&v| v.max(floor).ln()).collect();
+
+    let mut out = Vec::with_capacity(n);
+    for i in 0..n {
+        let x = xs[i];
+        let dist_ratio = ((x - x_mid).abs() / max_abs_dist).min(1.0);
+        let half_width = (base_half_width_frac * x_range * (1.0 + edge_growth * dist_ratio))
+            .min(max_abs_dist * 0.9);
+
+        // Gaussian-weighted mean instead of a hard window + median.
+        // sigma = half_width/2 gives a smooth falloff instead of a hard cutoff,
+        // which is what actually removes the stair-stepping.
+        let sigma = (half_width / 2.0).max(f64::EPSILON);
+        let mut weighted_sum = 0.0;
+        let mut weight_total = 0.0;
+        for j in 0..n {
+            let d = xs[j] - x;
+            let w = (-0.5 * (d / sigma).powi(2)).exp();
+            weighted_sum += w * log_vals[j];
+            weight_total += w;
+        }
+        let mean_log = if weight_total > 0.0 { weighted_sum / weight_total } else { log_vals[i] };
+        out.push(mean_log.exp());
+    }
+    out
+}
+
 fn main() -> Result<(), Box<dyn Error>> {
     let mut args = std::env::args().skip(1);
     let mut id_opt: Option<usize> = None;
     // default catalog is symbolic_catalog.txt per your request
     let mut catalog = "symbolic_catalog.txt".to_string();
-    let mut xmin = -10.0f64;
-    let mut xmax = 10.0f64;
+    let mut xmin = config::PLOT_XMIN;
+    let mut xmax = config::PLOT_XMAX;
     let mut n = 1000usize;
+    let mut smooth_window = config::PLOT_SMOOTHING_WINDOW;
+    let mut smooth_scale = config::PLOT_SMOOTHING_SCALE;
     let mut out = "plot.png".to_string();
     let mut density_out = "density.png".to_string();
+    let mut density_smooth_out = "density_smooth.png".to_string();
 
     while let Some(arg) = args.next() {
         match arg.as_str() {
@@ -525,10 +601,13 @@ fn main() -> Result<(), Box<dyn Error>> {
             "--xmin" => { if let Some(v) = args.next() { xmin = v.parse()?; } }
             "--xmax" => { if let Some(v) = args.next() { xmax = v.parse()?; } }
             "--n" => { if let Some(v) = args.next() { n = v.parse()?; } }
+            "--smooth-window" => { if let Some(v) = args.next() { smooth_window = v.parse()?; } }
+            "--smooth-scale" => { if let Some(v) = args.next() { smooth_scale = v.parse()?; } }
             "--out" => { if let Some(v) = args.next() { out = v; } }
             "--density-out" => { if let Some(v) = args.next() { density_out = v; } }
+            "--density-smooth-out" => { if let Some(v) = args.next() { density_smooth_out = v; } }
             "--help" | "-h" => {
-                println!("Usage: --id <N> [--catalog <file>] [--xmin <f>] [--xmax <f>] [--n <samples>] [--out <file>] [--density-out <file>]");
+                println!("Usage: --id <N> [--catalog <file>] [--xmin <f>] [--xmax <f>] [--n <samples>] [--smooth-window <n>] [--smooth-scale <f>] [--out <file>] [--density-out <file>] [--density-smooth-out <file>]");
                 return Ok(());
             }
             other => { eprintln!("Unknown argument: {}", other); }
@@ -707,17 +786,95 @@ fn main() -> Result<(), Box<dyn Error>> {
         })
         .draw()?;
 
+    let raw_points: Vec<(f64, f64)> = diff_vals.iter().cloned().collect();
+    let raw_values: Vec<f64> = raw_points.iter().map(|(_, v)| *v).collect();
+    let xs_for_smoothing: Vec<f64> = raw_points.iter().map(|(x, _)| *x).collect();
+    let smoothed_values = rolling_mean(&raw_values, &xs_for_smoothing, smooth_window, smooth_scale);
+    let smoothed_points: Vec<(f64, f64)> = raw_points.iter().enumerate()
+        .map(|(i, (x, _))| (*x, smoothed_values[i]))
+        .collect();
+
     density_chart.draw_series(AreaSeries::new(
-        diff_vals.iter().cloned(),
+        raw_points.iter().cloned(),
         0.0,
         &RGBColor(60, 120, 180).mix(0.25),
     ))?;
     density_chart.draw_series(LineSeries::new(
-        diff_vals.iter().cloned(),
-        ShapeStyle::from(&RGBColor(60, 120, 180)).stroke_width(2),
+        raw_points.iter().cloned(),
+        ShapeStyle::from(&RGBColor(60, 120, 180)).stroke_width(1),
     ))?;
+    density_chart.draw_series(LineSeries::new(
+        smoothed_points.clone(),
+        ShapeStyle::from(&RGBColor(220, 120, 20)).stroke_width(2),
+    ))?;
+
+    let lx = xmin + (xmax - xmin) * 0.02;
+    let ly = density_ymax - (density_ymax - density_ymin) * 0.08;
+    let lx2 = lx + (xmax - xmin) * 0.08;
+    density_chart.draw_series(LineSeries::new(
+        vec![(lx, ly), (lx2, ly)],
+        ShapeStyle::from(&RGBColor(220, 120, 20)).stroke_width(2),
+    ))?;
+    density_chart.draw_series(std::iter::once(Text::new(
+        "Rolling mean",
+        ((lx2 + (xmax - xmin) * 0.02), ly),
+        ("sans-serif", 13).into_font(),
+    )))?;
 
     density_root.present()?;
     println!("Saved density chart to {}", density_path.display());
+
+    let smooth_path = PathBuf::from(&density_smooth_out);
+    let smooth_root = BitMapBackend::new(&smooth_path, (1200, 700)).into_drawing_area();
+    smooth_root.fill(&WHITE)?;
+
+    let mut smooth_chart = ChartBuilder::on(&smooth_root)
+        .margin(20)
+        .caption("Smoothed difference magnitude |EML - Symbolic|", ("sans-serif", 18).into_font())
+        .x_label_area_size(40)
+        .y_label_area_size(80)
+        .build_cartesian_2d(xmin..xmax, density_ymin..density_ymax)?;
+
+    smooth_chart.configure_mesh()
+        .x_desc("x")
+        .y_desc("|EML - Symbolic|")
+        .y_label_formatter(&|v: &f64| {
+            if *v == 0.0 {
+                "0".to_string()
+            } else {
+                format!("{:.3e}", v)
+            }
+        })
+        .draw()?;
+
+    smooth_chart.draw_series(AreaSeries::new(
+        raw_points.iter().cloned(),
+        0.0,
+        &RGBColor(120, 160, 220).mix(0.15),
+    ))?;
+    smooth_chart.draw_series(LineSeries::new(
+        raw_points.iter().cloned(),
+        ShapeStyle::from(&RGBColor(120, 160, 220)).stroke_width(1),
+    ))?;
+    smooth_chart.draw_series(LineSeries::new(
+        smoothed_points.clone(),
+        ShapeStyle::from(&RGBColor(220, 120, 20)).stroke_width(2),
+    ))?;
+
+    let lx = xmin + (xmax - xmin) * 0.02;
+    let ly = density_ymax - (density_ymax - density_ymin) * 0.08;
+    let lx2 = lx + (xmax - xmin) * 0.08;
+    smooth_chart.draw_series(LineSeries::new(
+        vec![(lx, ly), (lx2, ly)],
+        ShapeStyle::from(&RGBColor(220, 120, 20)).stroke_width(2),
+    ))?;
+    smooth_chart.draw_series(std::iter::once(Text::new(
+        "Rolling mean",
+        ((lx2 + (xmax - xmin) * 0.02), ly),
+        ("sans-serif", 13).into_font(),
+    )))?;
+
+    smooth_root.present()?;
+    println!("Saved smoothed density chart to {}", smooth_path.display());
     Ok(())
 }
