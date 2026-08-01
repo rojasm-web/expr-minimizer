@@ -14,6 +14,12 @@ stochastic fallback, built exactly to the task spec (Tasks 1-5).
 | `src/stochastic.rs` | 5 | population/mutation/crossover GP-style search, parallel fitness eval via `rayon` |
 | `src/main.rs` | deliverable 5 | `minimize_expr(&Arena, u32, Duration) -> (Arena, u32, u64)` wiring saturation + fallback |
 
+## Running the binaries
+
+- `cargo run` runs the main minimizer binary from `src/main.rs`.
+- `cargo run --bin plot_eml_from_catalog -- --id 1` runs the plotter binary from `src/bin/plot_eml_from_catalog.rs`.
+- `make run` and `make plot` provide the same entry points through the project Makefile.
+
 ## Design decisions worth flagging
 
 - **Constants in the `egg` language.** `egg::define_language!` requires leaf

@@ -27,6 +27,244 @@ enum Node {
     Prim(Box<Node>, Box<Node>), // eml(left, right)
 }
 
+#[derive(Debug, Clone)]
+enum SymbolicNode {
+    Var,
+    Num(f64),
+    Complex(Complex64),
+    I,
+    E,
+    Pi,
+    Add(Box<SymbolicNode>, Box<SymbolicNode>),
+    Sub(Box<SymbolicNode>, Box<SymbolicNode>),
+    Mul(Box<SymbolicNode>, Box<SymbolicNode>),
+    Div(Box<SymbolicNode>, Box<SymbolicNode>),
+    Pow(Box<SymbolicNode>, Box<SymbolicNode>),
+    Ln(Box<SymbolicNode>),
+    Exp(Box<SymbolicNode>),
+    Neg(Box<SymbolicNode>),
+}
+
+fn parse_symbolic_expr(input: &str) -> Result<SymbolicNode, Box<dyn Error>> {
+    let chars: Vec<char> = input.trim().chars().collect();
+    let mut pos = 0usize;
+
+    fn skip_ws(chars: &[char], pos: &mut usize) {
+        while *pos < chars.len() && chars[*pos].is_whitespace() {
+            *pos += 1;
+        }
+    }
+
+    fn peek_char(chars: &[char], pos: usize) -> Option<char> {
+        chars.get(pos).cloned()
+    }
+
+    fn consume_char(chars: &[char], pos: &mut usize, expected: char) -> Result<(), Box<dyn Error>> {
+        skip_ws(chars, pos);
+        if peek_char(chars, *pos) == Some(expected) {
+            *pos += 1;
+            Ok(())
+        } else {
+            let found = peek_char(chars, *pos).unwrap_or_default();
+            Err(format!("Expected '{}' but found '{}'", expected, found).into())
+        }
+    }
+
+    fn parse_ident(chars: &[char], pos: &mut usize) -> Option<String> {
+        skip_ws(chars, pos);
+        let start = *pos;
+        while *pos < chars.len() && (chars[*pos].is_alphanumeric() || chars[*pos] == '_') {
+            *pos += 1;
+        }
+        if start < *pos {
+            Some(chars[start..*pos].iter().collect())
+        } else {
+            None
+        }
+    }
+
+    fn parse_number(chars: &[char], pos: &mut usize) -> Result<SymbolicNode, Box<dyn Error>> {
+        skip_ws(chars, pos);
+        let start = *pos;
+        while *pos < chars.len() {
+            let c = chars[*pos];
+            if c.is_ascii_digit() || c == '.' || c == 'e' || c == 'E' || c == '+' || c == '-' {
+                *pos += 1;
+            } else {
+                break;
+            }
+        }
+        let token: String = chars[start..*pos].iter().collect();
+        if token.is_empty() {
+            return Err("Expected numeric literal".into());
+        }
+        let lower = token.to_ascii_lowercase();
+        if lower == "inf" || lower == "+inf" {
+            return Ok(SymbolicNode::Num(f64::INFINITY));
+        }
+        if lower == "-inf" {
+            return Ok(SymbolicNode::Num(f64::NEG_INFINITY));
+        }
+        if token.ends_with('i') || token.ends_with('I') {
+            let real = token[..token.len() - 1].trim().parse::<f64>()?;
+            return Ok(SymbolicNode::Complex(Complex64::new(0.0, real)));
+        }
+        Ok(SymbolicNode::Num(token.parse::<f64>()?))
+    }
+
+    fn parse_primary(chars: &[char], pos: &mut usize) -> Result<SymbolicNode, Box<dyn Error>> {
+        skip_ws(chars, pos);
+        if let Some(c) = peek_char(chars, *pos) {
+            if c == '(' {
+                *pos += 1;
+                let inner = parse_add_sub(chars, pos)?;
+                consume_char(chars, pos, ')')?;
+                return Ok(inner);
+            }
+            if c == '+' {
+                *pos += 1;
+                return parse_primary(chars, pos);
+            }
+            if c == '-' {
+                *pos += 1;
+                let inner = parse_primary(chars, pos)?;
+                return Ok(SymbolicNode::Neg(Box::new(inner)));
+            }
+        }
+
+        if let Some(c) = peek_char(chars, *pos) {
+            if c.is_ascii_digit() || c == '.' {
+                return parse_number(chars, pos);
+            }
+        }
+
+        if let Some(name) = parse_ident(chars, pos) {
+            let lower = name.to_ascii_lowercase();
+            match lower.as_str() {
+                "x" => return Ok(SymbolicNode::Var),
+                "xi" => {
+                    return Ok(SymbolicNode::Mul(Box::new(SymbolicNode::Var), Box::new(SymbolicNode::I)));
+                }
+                "i" => return Ok(SymbolicNode::I),
+                "e" => return Ok(SymbolicNode::E),
+                "pi" => return Ok(SymbolicNode::Pi),
+                "ln" => {
+                    let arg = parse_primary(chars, pos)?;
+                    return Ok(SymbolicNode::Ln(Box::new(arg)));
+                }
+                "exp" => {
+                    let arg = parse_primary(chars, pos)?;
+                    return Ok(SymbolicNode::Exp(Box::new(arg)));
+                }
+                _ => {
+                    if let Ok(val) = name.parse::<f64>() {
+                        return Ok(SymbolicNode::Num(val));
+                    }
+                }
+            }
+        }
+
+        Err("Unexpected token in symbolic expression".into())
+    }
+
+    fn parse_power(chars: &[char], pos: &mut usize) -> Result<SymbolicNode, Box<dyn Error>> {
+        let mut left = parse_primary(chars, pos)?;
+        skip_ws(chars, pos);
+        if peek_char(chars, *pos) == Some('^') {
+            *pos += 1;
+            let right = parse_power(chars, pos)?;
+            left = SymbolicNode::Pow(Box::new(left), Box::new(right));
+        }
+        Ok(left)
+    }
+
+    fn parse_mul_div(chars: &[char], pos: &mut usize) -> Result<SymbolicNode, Box<dyn Error>> {
+        let mut left = parse_power(chars, pos)?;
+        loop {
+            skip_ws(chars, pos);
+            match peek_char(chars, *pos) {
+                Some('*') => {
+                    *pos += 1;
+                    let right = parse_power(chars, pos)?;
+                    left = SymbolicNode::Mul(Box::new(left), Box::new(right));
+                }
+                Some('/') => {
+                    *pos += 1;
+                    let right = parse_power(chars, pos)?;
+                    left = SymbolicNode::Div(Box::new(left), Box::new(right));
+                }
+                _ => break,
+            }
+        }
+        Ok(left)
+    }
+
+    fn parse_add_sub(chars: &[char], pos: &mut usize) -> Result<SymbolicNode, Box<dyn Error>> {
+        let mut left = parse_mul_div(chars, pos)?;
+        loop {
+            skip_ws(chars, pos);
+            match peek_char(chars, *pos) {
+                Some('+') => {
+                    *pos += 1;
+                    let right = parse_mul_div(chars, pos)?;
+                    left = SymbolicNode::Add(Box::new(left), Box::new(right));
+                }
+                Some('-') => {
+                    *pos += 1;
+                    let right = parse_mul_div(chars, pos)?;
+                    left = SymbolicNode::Sub(Box::new(left), Box::new(right));
+                }
+                _ => break,
+            }
+        }
+        Ok(left)
+    }
+
+    let expr = parse_add_sub(&chars, &mut pos)?;
+    skip_ws(&chars, &mut pos);
+    if pos < chars.len() {
+        Err(format!("Unexpected trailing tokens: {}", chars[pos..].iter().collect::<String>()).into())
+    } else {
+        Ok(expr)
+    }
+}
+
+fn eval_symbolic(node: &SymbolicNode, x: f64) -> Complex64 {
+    match node {
+        SymbolicNode::Var => Complex64::new(x, 0.0),
+        SymbolicNode::Num(v) => Complex64::new(*v, 0.0),
+        SymbolicNode::Complex(c) => *c,
+        SymbolicNode::I => Complex64::new(0.0, 1.0),
+        SymbolicNode::E => Complex64::new(std::f64::consts::E, 0.0),
+        SymbolicNode::Pi => Complex64::new(std::f64::consts::PI, 0.0),
+        SymbolicNode::Add(a, b) => eval_symbolic(a, x) + eval_symbolic(b, x),
+        SymbolicNode::Sub(a, b) => eval_symbolic(a, x) - eval_symbolic(b, x),
+        SymbolicNode::Mul(a, b) => eval_symbolic(a, x) * eval_symbolic(b, x),
+        SymbolicNode::Div(a, b) => eval_symbolic(a, x) / eval_symbolic(b, x),
+        SymbolicNode::Pow(a, b) => {
+            let base = eval_symbolic(a, x);
+            let exp = eval_symbolic(b, x);
+            (base.ln() * exp).exp()
+        }
+        SymbolicNode::Ln(inner) => eval_symbolic(inner, x).ln(),
+        SymbolicNode::Exp(inner) => eval_symbolic(inner, x).exp(),
+        SymbolicNode::Neg(inner) => -eval_symbolic(inner, x),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parses_and_evaluates_symbolic_expressions() {
+        let expr = parse_symbolic_expr("e - (i * pi)").expect("valid symbolic expression");
+        let value = eval_symbolic(&expr, 2.0);
+        assert!((value.re - (std::f64::consts::E)).abs() < 1e-9);
+        assert!((value.im + std::f64::consts::PI).abs() < 1e-9);
+    }
+}
+
 /// Read the catalog and extract (symbolic_value, eml_subtree) for a given id.
 fn load_catalog_entry(catalog_path: &str, target_id: usize) -> Result<(String, String), Box<dyn Error>> {
     let mut text = String::new();
@@ -278,6 +516,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut xmax = 10.0f64;
     let mut n = 1000usize;
     let mut out = "plot.png".to_string();
+    let mut density_out = "density.png".to_string();
 
     while let Some(arg) = args.next() {
         match arg.as_str() {
@@ -287,8 +526,9 @@ fn main() -> Result<(), Box<dyn Error>> {
             "--xmax" => { if let Some(v) = args.next() { xmax = v.parse()?; } }
             "--n" => { if let Some(v) = args.next() { n = v.parse()?; } }
             "--out" => { if let Some(v) = args.next() { out = v; } }
+            "--density-out" => { if let Some(v) = args.next() { density_out = v; } }
             "--help" | "-h" => {
-                println!("Usage: --id <N> [--catalog <file>] [--xmin <f>] [--xmax <f>] [--n <samples>] [--out <file>]");
+                println!("Usage: --id <N> [--catalog <file>] [--xmin <f>] [--xmax <f>] [--n <samples>] [--out <file>] [--density-out <file>]");
                 return Ok(());
             }
             other => { eprintln!("Unknown argument: {}", other); }
@@ -307,6 +547,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let (sym, eml) = load_catalog_entry(&catalog, id)?;
     // parse eml early so we can compute stats and put them into the PNG caption
     let node = parse_eml(&eml).map_err(|e| format!("Failed to parse EML subtree: {}", e))?;
+    let symbolic_node = parse_symbolic_expr(&sym).map_err(|e| format!("Failed to parse symbolic expression '{}': {}", sym, e))?;
     let (nodes, leaves, depth) = eml_stats(&node);
 
     // Print compact info to stdout for debugging
@@ -317,10 +558,14 @@ fn main() -> Result<(), Box<dyn Error>> {
     let xs = linspace(xmin, xmax, n);
     let mut revals: Vec<(f64, f64)> = Vec::with_capacity(xs.len());
     let mut imvals: Vec<(f64, f64)> = Vec::with_capacity(xs.len());
+    let mut diff_vals: Vec<(f64, f64)> = Vec::with_capacity(xs.len());
     for &x in &xs {
-        let y = eval_node(&node, x);
-        revals.push((x, y.re));
-        imvals.push((x, y.im));
+        let eml_val = eval_node(&node, x);
+        let sym_val = eval_symbolic(&symbolic_node, x);
+        let diff = eml_val - sym_val;
+        revals.push((x, eml_val.re));
+        imvals.push((x, eml_val.im));
+        diff_vals.push((x, diff.norm()));
     }
 
     // Determine y range (include both real and imaginary parts)
@@ -432,5 +677,47 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     root.present()?;
     println!("Saved plot to {}", out_path.display());
+
+    let density_path = PathBuf::from(&density_out);
+    let density_root = BitMapBackend::new(&density_path, (1200, 700)).into_drawing_area();
+    density_root.fill(&WHITE)?;
+
+    let max_diff = diff_vals.iter().map(|&(_, v)| v).fold(0.0f64, |a, b| a.max(b));
+    let density_ymin = 0.0f64;
+    let mut density_ymax = max_diff;
+    let density_yrange = density_ymax - density_ymin;
+    density_ymax += density_yrange * 0.08;
+
+    let mut density_chart = ChartBuilder::on(&density_root)
+        .margin(20)
+        .caption("Difference magnitude |EML - Symbolic|", ("sans-serif", 18).into_font())
+        .x_label_area_size(40)
+        .y_label_area_size(80)
+        .build_cartesian_2d(xmin..xmax, density_ymin..density_ymax)?;
+
+    density_chart.configure_mesh()
+        .x_desc("x")
+        .y_desc("|EML - Symbolic|")
+        .y_label_formatter(&|v: &f64| {
+            if *v == 0.0 {
+                "0".to_string()
+            } else {
+                format!("{:.3e}", v)
+            }
+        })
+        .draw()?;
+
+    density_chart.draw_series(AreaSeries::new(
+        diff_vals.iter().cloned(),
+        0.0,
+        &RGBColor(60, 120, 180).mix(0.25),
+    ))?;
+    density_chart.draw_series(LineSeries::new(
+        diff_vals.iter().cloned(),
+        ShapeStyle::from(&RGBColor(60, 120, 180)).stroke_width(2),
+    ))?;
+
+    density_root.present()?;
+    println!("Saved density chart to {}", density_path.display());
     Ok(())
 }

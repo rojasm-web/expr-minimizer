@@ -2,6 +2,7 @@
 name = "expr-minimizer"
 version = "0.1.0"
 edition = "2021"
+default-run = "expr-minimizer"
 description = "Generic arena-based expression rewriter with equality saturation and stochastic fallback."
 
 [dependencies]

@@ -7,6 +7,7 @@
 //! the single free-variable leaf.
 use std::fs::File;
 use std::io::Write;
+use std::process::Command;
 use std::time::{Duration, Instant};
 
 pub mod arena;
@@ -266,6 +267,24 @@ fn main() {
     writeln!(file, "\nMINIMIZED:\n{}", min_single_line).unwrap();
 
     println!("\nSaved single-line representations to `expressions.txt`.");
+
+    let status = Command::new("cargo")
+        .arg("run")
+        .arg("--bin")
+        .arg("plot_eml_from_catalog")
+        .arg("--")
+        .arg("--catalog")
+        .arg("symbolic_catalog.txt")
+        .arg("--out")
+        .arg("plot.png")
+        .arg("--density-out")
+        .arg("density.png")
+        .status()
+        .expect("failed to launch plot_eml_from_catalog");
+
+    if !status.success() {
+        eprintln!("plot_eml_from_catalog exited with status {:?}", status.code());
+    }
 }
 
 #[cfg(test)]
